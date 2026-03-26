@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoC Dashboard — Nebraska Homelessness Response</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f5f0;
+    --card: #ffffff;
+    --border: #e2e4dc;
+    --teal: #2d8c7a;
+    --teal-light: #e8f5f2;
+    --teal-mid: #c2e4dd;
+    --text: #1a1f1c;
+    --muted: #5a6360;
+    --tag-lincoln: #dbeafe;
+    --tag-lincoln-text: #1e40af;
+    --tag-omaha: #fef3c7;
+    --tag-omaha-text: #92400e;
+    --tag-state: #ede9fe;
+    --tag-state-text: #5b21b6;
+    --radius: 14px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 20px 60px;
+  }
+
+  .grid {
+    max-width: 960px;
+    margin: 0 auto;
+    display: grid;
+    gap: 16px;
+  }
+
+  .row-2 { grid-template-columns: 1fr 1fr; }
+
+  @media (max-width: 640px) { .row-2 { grid-template-columns: 1fr; } }
+
+  /* Accordion Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .card-header:hover { background: #fafbf9; }
+
+  .icon-wrap {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .icon-teal { background: var(--teal-light); }
+  .icon-amber { background: #fef3c7; }
+  .icon-purple { background: #ede9fe; }
+  .icon-rose { background: #fce7f3; }
+  .icon-blue { background: #dbeafe; }
+  .icon-green { background: #dcfce7; }
+
+  .card-title-block { flex: 1; }
+  .card-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .card-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+  .chevron {
+    font-size: 10px;
+    color: var(--muted);
+    transition: transform 0.25s;
+  }
+
+  .card.open .chevron { transform: rotate(180deg); }
+
+  .card-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+
+  .card.open .card-body { max-height: 900px; }
+
+  .card-inner {
+    padding: 0 18px 18px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+
+  .card-inner p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #2e3532;
+    margin-bottom: 10px;
+  }
+
+  .card-inner p:last-child { margin-bottom: 0; }
+
+  strong { font-weight: 600; }
+
+  /* CoC Region Cards */
+  .region-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  @media (max-width: 640px) { .region-row { grid-template-columns: 1fr; } }
+
+  .region-card {
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    background: #fafbf9;
+  }
+
+  .region-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 6px;
+  }
+
+  .tag-lincoln { background: var(--tag-lincoln); color: var(--tag-lincoln-text); }
+  .tag-omaha { background: var(--tag-omaha); color: var(--tag-omaha-text); }
+  .tag-state { background: var(--tag-state); color: var(--tag-state-text); }
+
+  .region-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .region-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Project Types grid */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  @media (max-width: 640px) { .projects-grid { grid-template-columns: 1fr; } }
+
+  .project-item {
+    background: #fafbf9;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 13px;
+  }
+
+  .project-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal);
+    margin-bottom: 4px;
+  }
+
+  .project-desc {
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: #3a4441;
+  }
+
+  /* Categories */
+  .cat-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+
+  .cat-item {
+    background: #fafbf9;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+
+  .cat-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal);
+    margin-bottom: 4px;
+  }
+
+  .cat-desc {
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: #3a4441;
+  }
+
+  .cat-desc ul {
+    margin: 6px 0 0 16px;
+    padding: 0;
+  }
+
+  .cat-desc li {
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: #3a4441;
+    margin-bottom: 3px;
+  }
+
+  /* Full-width banner card */
+  .banner-card {
+    background: var(--teal);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    color: #fff;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .banner-card .icon-wrap { background: rgba(255,255,255,0.18); }
+
+  .banner-card .card-title { color: #fff; }
+  .banner-card .card-sub { color: rgba(255,255,255,0.72); }
+
+  .banner-card p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.9);
+    margin-top: 10px;
+  }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+</style>
+</head>
+<body>
+
+
+
+<div class="grid">
+
+  <!-- Row 1: What is CoC + Mission -->
+  <div class="grid row-2">
+
+    <div class="card open" onclick="toggle(this)">
+      <div class="card-header">
+        <div class="icon-wrap icon-teal">🧩</div>
+        <div class="card-title-block">
+          <div class="card-title">What is a CoC?</div>
+          <div class="card-sub">Continuum of Care — who's involved &amp; why</div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="card-body">
+        <div class="card-inner">
+          <p>A <strong>Continuum of Care (CoC)</strong> is a group including but not limited to homeless service providers, governmental entities, businesses, community advocates, public housing agencies, school districts, mental health agencies, hospitals, universities, affordable housing developers, law enforcement, and persons with lived experience of homelessness.</p>
+          <p>CoCs carry out the responsibilities required to receive funding from the federal government to support Nebraska's homelessness response system.</p>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="card open" onclick="toggle(this)">
+      <div class="card-header">
+        <div class="icon-wrap icon-rose">🎯</div>
+        <div class="card-title-block">
+          <div class="card-title">CoCs' Mission</div>
+          <div class="card-sub">What we're working toward</div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="card-body">
+        <div class="card-inner">
+          <p>The mission of CoCs is to support a community-wide commitment to ending homelessness, and to quickly re-house, improve access to mainstream benefits programs, and increase self-sufficiency among those experiencing homelessness.</p>
+          <p>CoCs work to achieve this mission by providing states with a coordinated, strategic, evidence-based approach to assisting those experiencing or at-risk of homelessness.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Community Services Matrix (full width) -->
+  <div class="card open" onclick="toggle(this)">
+    <div class="card-header">
+      <div class="icon-wrap icon-blue">📍</div>
+      <div class="card-title-block">
+        <div class="card-title">Community Services Matrix</div>
+        <div class="card-sub">3 CoCs across Nebraska</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="card-inner">
+        <p>Each CoC covers a distinct geographic area. There are three CoCs in Nebraska: The City of Lincoln CoC (serving Lincoln, NE), Threshold CoC (serving the Omaha metropolitan area), and the Nebraska Balance of State CoC (serving all other Nebraska communities). This digital dashboard reflects data for the City of Lincoln and Nebraska Balance of State CoCs.</p>
+        <div class="region-row">
+          <div class="region-card">
+            <span class="region-tag tag-lincoln">Lincoln</span>
+            <div class="region-name">City of Lincoln CoC</div>
+            <div class="region-desc">Serving Lincoln, NE</div>
+          </div>
+          <div class="region-card">
+            <span class="region-tag tag-omaha">Omaha Metro</span>
+            <div class="region-name">Threshold CoC</div>
+            <div class="region-desc">Serving the Omaha metropolitan area</div>
+          </div>
+          <div class="region-card">
+            <span class="region-tag tag-state">Statewide</span>
+            <div class="region-name">Nebraska Balance of State CoC</div>
+            <div class="region-desc">Serving all other Nebraska communities</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Functional Zero (full width teal banner) -->
+  <div class="card open" onclick="toggle(this)">
+    <div class="card-header">
+      <div class="icon-wrap icon-green">✅</div>
+      <div class="card-title-block">
+        <div class="card-title">What is Functional Zero?</div>
+        <div class="card-sub">The goal we're working toward</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="card-inner">
+        <p>When a community shows that its homeless service system has practically ended homelessness for a population in a way that is measurable and equitable, prevents homelessness whenever possible, and ensures that when homelessness does occur, it's a <strong>rare, brief, and one-time occurrence</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Types (full width) -->
+  <div class="card open" onclick="toggle(this)">
+    <div class="card-header">
+      <div class="icon-wrap icon-purple">🏗️</div>
+      <div class="card-title-block">
+        <div class="card-title">What are our Project Types?</div>
+        <div class="card-sub">6 program models in our system</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="card-inner">
+        <div class="projects-grid">
+          <div class="project-item">
+            <div class="project-name">Street Outreach</div>
+            <div class="project-desc">Street Outreach programs are dedicated to supporting individuals experiencing homelessness by meeting them where they are and building trusting relationships. These programs help individuals meet their basic needs and connect with essential services. Street outreach aims to assist people in overcoming barriers to housing, providing compassionate support throughout the process.</div>
+          </div>
+          <div class="project-item">
+            <div class="project-name">Emergency Shelter</div>
+            <div class="project-desc">Emergency shelters aim to provide support services and a safe environment for individuals and families experiencing homelessness, addressing immediate needs while working toward sustainable solutions. Some shelters may provide food, hygiene facilities, and connect residents with job training and mental health services.</div>
+          </div>
+          <div class="project-item">
+            <div class="project-name">Transitional Housing</div>
+            <div class="project-desc">Transitional housing offers temporary accommodations and supportive services to help individuals and families experiencing homelessness move from homelessness to permanent, affordable housing. It typically involves a room or apartment rather than an emergency shelter and can include housing costs and services.</div>
+          </div>
+          <div class="project-item">
+            <div class="project-name">Rapid Rehousing</div>
+            <div class="project-desc">Rapid rehousing is a short-term intervention that helps individuals and families quickly exit homelessness and secure permanent housing. It provides tailored rental assistance and supportive services without preconditions, addressing immediate barriers to housing stability and aiming to reduce the duration of homelessness and prevent future episodes. The assistance is designed to be as brief as possible while meeting the specific needs of each household.</div>
+          </div>
+          <div class="project-item">
+            <div class="project-name">Joint TH-RRH</div>
+            <div class="project-desc">Uses transitional housing and rapid rehousing to provide a safe place for people to stay with financial assistance and supportive services (transitional housing) until program participants are able to move into permanent housing (rapid rehousing).</div>
+          </div>
+          <div class="project-item">
+            <div class="project-name">Permanent Supportive Housing</div>
+            <div class="project-desc">A permanent housing placement in which housing assistance (e.g., long-term financial support) and supportive services are provided to aid housing stability for households that have at least one member with a disability.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Homelessness Categories (full width) -->
+  <div class="card open" onclick="toggle(this)">
+    <div class="card-header">
+      <div class="icon-wrap icon-amber">📋</div>
+      <div class="card-title-block">
+        <div class="card-title">Homelessness Categories</div>
+        <div class="card-sub">How the federal government defines homelessness</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="card-inner">
+        <p>The federal government breaks down "homelessness" into several categories reflecting unique sets of experiences for those at risk of homelessness or experiencing homelessness. This allows funds and strategies to be better tailored to better address our community members' specific needs.</p>
+        <div class="cat-list">
+          <div class="cat-item">
+            <div class="cat-name">Literally Homeless</div>
+            <div class="cat-desc">An individual or family who doesn't have a permanent and safe nighttime residence. Specifically, this means that an individual or family:
+              <ul>
+                <li>Is living somewhere unsafe/not meant for people to reside in, or</li>
+                <li>Is living in a shelter that provides temporary living arrangements, or</li>
+                <li>Is leaving an institution (e.g., hospital) where they resided for 90 days or less and who resided in a shelter or place not meant for human habitation before they entered the institution.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="cat-item">
+            <div class="cat-name">Imminent Risk of Homelessness</div>
+            <div class="cat-desc">An individual or family who will lose their primary nighttime residence in the near future. Specifically, this means that the individual or family:
+              <ul>
+                <li>Will lose their residence within 14 days of their application for homelessness assistance</li>
+                <li>No new residence has been identified</li>
+                <li>And the individual or family doesn't have the support networks or resources needed to find other safe, permanent housing</li>
+              </ul>
+            </div>
+          </div>
+          <div class="cat-item">
+            <div class="cat-name">Fleeing / Attempting to Flee Domestic Violence</div>
+            <div class="cat-desc">Any individual or family who is fleeing or attempting to flee domestic violence, doesn't have a safe residence to go to, and doesn't have the support network or resources to find other safe, permanent housing.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How we collect data -->
+  <div class="card open" onclick="toggle(this)">
+    <div class="card-header">
+      <div class="icon-wrap icon-teal">🗄️</div>
+      <div class="card-title-block">
+        <div class="card-title">How Do We Collect This Data?</div>
+        <div class="card-sub">Nebraska HMIS system</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="card-inner">
+        <p>Homeless and housing service providers utilize a central database, <strong>Nebraska Homeless Management Information System</strong>.</p>
+        <p>Data is collected from consumers as part of their enrollment into services/housing.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(card) {
+    card.classList.toggle('open');
+  }
+</script>
+</body>
+</html>
